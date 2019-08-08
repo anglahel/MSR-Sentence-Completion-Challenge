@@ -101,5 +101,6 @@ if __name__ == "__main__":
     init = tf.global_variables_initializer()
     sess = tf.Session()
     sess.run(init)
-    sess.run(net.assign_op, feed_dict={net.embedding_placeholder : embedding})
+    with net.graph.as_default():
+       sess.run(net.assign_op, feed_dict={net.embedding_placeholder : embedding})
     

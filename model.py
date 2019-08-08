@@ -1,6 +1,22 @@
 import tensorflow as tf
 import numpy as np
 
+ 
+def fully_connected(input_emb, latent_size = 128): 
+        self.graph = tf.Graph() 
+        batch_size = None 
+        layer_size = 300 
+        with self.graph.as_default(): 
+ 
+            #self.word_input = tf.placeholder(tf.int32, shape=(None,embedding_size)) 
+                 
+            self.layer1 = tf.layers.dense(inputs=input_emb, units=layer_size, activation = tf.nn.tanh) 
+            self.layer2 = tf.layers.dense(inputs=self.layer1, units=layer_size, activation = tf.nn.tanh) 
+ 
+            self.ret = tf.layers.dense(inputs=self.layer2, units=latent_size, activation=tf.nn.tanh) 
+ 
+        return self.ret 
+ 
 
 
 class Word_FC():
