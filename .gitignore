@@ -4,4 +4,5 @@ data/*
 *.TXT
 *.zip
 *.tgz
+*.csv*
 __pycache__
