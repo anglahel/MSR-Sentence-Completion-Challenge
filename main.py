@@ -8,7 +8,6 @@ import collections
 import model
 
 
-a=2
 
 emb_data = "glove.6B.300d.txt"
 
@@ -98,9 +97,10 @@ def load_embeddings():
 if __name__ == "__main__":
     embedding, dict_size, embedding_dim = load_embeddings()
     net = model.Word_FC(dict_size, embedding_dim)
-    init = tf.global_variables_initializer()
-    sess = tf.Session()
-    sess.run(init)
+
     with net.graph.as_default():
+        init = tf.global_variables_initializer()
+        sess = tf.Session()
+        sess.run(init)
        sess.run(net.assign_op, feed_dict={net.embedding_placeholder : embedding})
     

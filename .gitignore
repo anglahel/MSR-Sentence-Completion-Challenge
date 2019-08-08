@@ -5,4 +5,5 @@ data/*
 *.zip
 *.tgz
 *.csv*
+.*
 __pycache__
