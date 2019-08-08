@@ -15,6 +15,7 @@ class Word_Embedding():
         self.word_ids = tf.placeholder(dtype=tf.int32, shape=[self.batch_size, None])
         self.embedded_words = tf.nn.embedding_lookup(self.W, self.word_ids)
         self.print_op = tf.Print(self.embedded_words, [self.embedded_words])
+        return self.embedded_words
 
 
 
@@ -24,8 +25,8 @@ class Model():
         self.graph = tf.Graph()
         with self.graph.as_default():
             word_embedding_class = Word_Embedding(dict_size, embedding_dim)
-            word_embedding_class.word_embedding_layer()
-            self.fully_connected(word_embedding_class.embedded_words, latent_size=128)
+            embedded_words = word_embedding_class.word_embedding_layer()
+            self.fully_connected(embedded_words, latent_size=128)
             sess = tf.Session()
             sess.run(word_embedding_class.assign_op, feed_dict={word_embedding_class.embedding_placeholder: embedding})
             sess.run(word_embedding_class.print_op, feed_dict={word_embedding_class.word_ids: [[1]]})
