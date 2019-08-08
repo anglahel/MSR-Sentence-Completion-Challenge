@@ -37,5 +37,5 @@ class Model():
             word_embedding_class = Word_Embedding(dict_size, embedding_dim)
             sess = tf.Session()
             sess.run(word_embedding_class.assign_op, feed_dict={word_embedding_class.embedding_placeholder:embedding})
-
+            sess.run(word_embedding_class.print_op, feed_dict={word_embedding_class.word_ids:[[1]]})
 
