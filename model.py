@@ -29,7 +29,7 @@ class Model():
             sess = tf.Session()
             sess.run(word_embedding_class.assign_op, feed_dict={word_embedding_class.embedding_placeholder: embedding})
             sess.run(word_embedding_class.print_op, feed_dict={word_embedding_class.word_ids: [[1]]})
-            sess.run(self.print_op, feed_dict=[[1]])
+            sess.run(self.print_op, feed_dict={word_embedding_class.word_ids: [[1]]})
     
     
     def fully_connected(self, input_embedding, latent_size=128): 
