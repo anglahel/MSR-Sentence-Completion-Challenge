@@ -19,7 +19,7 @@ def fully_connected(input_emb, latent_size = 128):
  
 
 
-class Word_FC():
+class Word_Emb():
     def __init__(self, dict_size, embedding_dim):
         self.graph = tf.Graph()
         batch_size = None
@@ -33,5 +33,8 @@ class Word_FC():
             embedded_words = tf.nn.embedding_lookup(W, self.word_ids)
             self.print_op = tf.Print(embedded_words, [embedded_words])
 
+class Model():
+    def __init__(self):
+	
 
 

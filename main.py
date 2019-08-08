@@ -89,7 +89,7 @@ def load_embeddings():
     embedding = np.asarray(tmp_array)
     print(len(embedding))
     print("\n")
-    print(len(embedding[0]))
+    print(embedding[1])
     
     return embedding, dict_size, embedding_dim
     
@@ -102,5 +102,5 @@ if __name__ == "__main__":
         init = tf.global_variables_initializer()
         sess = tf.Session()
         sess.run(init)
-       sess.run(net.assign_op, feed_dict={net.embedding_placeholder : embedding})
-    
+       	sess.run(net.assign_op, feed_dict={net.embedding_placeholder : embedding})
+        sess.run(net.print_op, feed_dict={net.word_ids:[[1]]})
