@@ -8,6 +8,8 @@ import collections
 import model
 
 
+a=2
+
 emb_data = "glove.6B.300d.txt"
 
 
