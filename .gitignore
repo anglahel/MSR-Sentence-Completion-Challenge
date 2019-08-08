@@ -1,0 +1,7 @@
+data/
+data/*
+*.txt
+*.TXT
+*.zip
+*.tgz
+__pycache__
