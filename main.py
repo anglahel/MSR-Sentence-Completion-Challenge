@@ -96,11 +96,5 @@ def load_embeddings():
 
 if __name__ == "__main__":
     embedding, dict_size, embedding_dim = load_embeddings()
-    net = model.Word_FC(dict_size, embedding_dim)
+    net = model.Model(embedding, dict_size, embedding_dim)
 
-    with net.graph.as_default():
-        init = tf.global_variables_initializer()
-        sess = tf.Session()
-        sess.run(init)
-       	sess.run(net.assign_op, feed_dict={net.embedding_placeholder : embedding})
-        sess.run(net.print_op, feed_dict={net.word_ids:[[1]]})
