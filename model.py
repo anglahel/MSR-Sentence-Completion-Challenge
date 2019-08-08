@@ -13,8 +13,8 @@ class Word_Embedding():
     
     def word_embedding_layer(self):
         self.word_ids = tf.placeholder(dtype=tf.int32, shape=[self.batch_size, None])
-        embedded_words = tf.nn.embedding_lookup(self.W, self.word_ids)
-        self.print_op = tf.Print(embedded_words, [embedded_words])
+        self.embedded_words = tf.nn.embedding_lookup(self.W, self.word_ids)
+        self.print_op = tf.Print(self.embedded_words, [self.embedded_words])
 
 
 
@@ -25,21 +25,22 @@ class Model():
         with self.graph.as_default():
             word_embedding_class = Word_Embedding(dict_size, embedding_dim)
             word_embedding_class.word_embedding_layer()
+            self.fully_connected(word_embedding_class.embedded_words, latent_size=128)
             sess = tf.Session()
             sess.run(word_embedding_class.assign_op, feed_dict={word_embedding_class.embedding_placeholder: embedding})
             sess.run(word_embedding_class.print_op, feed_dict={word_embedding_class.word_ids: [[1]]})
+            sess.run(self.print_op, feed_dict=[[1]])
     
     
     def fully_connected(self, input_embedding, latent_size=128): 
         
         layer_size = 300 
   
-        layer1 = tf.layers.dense(inputs=input_embedding, units=layer_size, activation=tf.nn.tanh) 
-        layer2 = tf.layers.dense(inputs=layer1, units=layer_size, activation=tf.nn.tanh) 
+        self.layer1 = tf.layers.dense(inputs=input_embedding, units=layer_size, activation=tf.nn.tanh) 
+        self.layer2 = tf.layers.dense(inputs=self.layer1, units=layer_size, activation=tf.nn.tanh) 
  
-        ret = tf.layers.dense(inputs=layer2, units=latent_size, activation=tf.nn.tanh) 
- 
-        return ret 
+        self.ret = tf.layers.dense(inputs=self.layer2, units=latent_size, activation=tf.nn.tanh) 
+        self.print_op = tf.Print(self.ret, [self.ret]) 
  
 
 
