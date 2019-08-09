@@ -4,6 +4,7 @@ import csv
 import numpy as np
 import tensorflow as tf
 import collections
+import pandas as pd
 
 import model
 
@@ -67,6 +68,12 @@ def load_embeddings():
     print("Loaded Glove")
 
     #TODO load training data in desirable form
+    
+    df = pd.read_csv("training_data.csv")
+
+    print(df.values[:5])
+
+
     training_data = read_data(fable_text)
 
     
@@ -89,13 +96,14 @@ def load_embeddings():
     embedding = np.asarray(tmp_array)
     print(len(embedding))
     print("\n")
-    print(embedding[1])
+    print(dict_size)
+    #print(embedding[1])
     
     return embedding, dict_size, embedding_dim
     
 
 if __name__ == "__main__":
     embedding, dict_size, embedding_dim = load_embeddings()
-    net = model.Model(embedding, dict_size, embedding_dim)
-    net.inference([[1,2,3,4,5], [10,9,8,7,6]])
+    #net = model.Model(embedding, dict_size, embedding_dim)
+    #net.inference([[1,2,3,4,5], [10,9,8,7,6]])
 

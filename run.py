@@ -49,9 +49,9 @@ propose impossible remedies .
 def load_embeddings(training_data):
     emb_reader = open(emb_data, 'r', encoding='UTF-8')
     
-    vocab = []
-    embed = []
-    emb_dict = {}
+    vocab = [] # vocab of glove
+    embed = [] # embeddings of glove
+    emb_dict = {} # dict word-embedding of glove
 
     #Load embeddings from pretrained model
 
@@ -69,7 +69,7 @@ def load_embeddings(training_data):
     #TODO load training data in desirable form
 
     
-    dictionary, rev_dictionary = build_scalar_encoding(training_data) #dictionary word-scalar
+    dictionary, rev_dictionary = build_scalar_encoding(training_data) # dictionary word-scalar in trainin data
 
     #Create embedding array
 
@@ -85,7 +85,7 @@ def load_embeddings(training_data):
             rand = np.random.uniform(low=-0.2, high=0.2, size=embedding_dim)
             tmp_array.append(rand)
 
-    embedding = np.asarray(tmp_array)
+    embedding = np.asarray(tmp_array) # array embedding is set on specific position(word id)
     print(len(embedding))
     print("\n")
     print(embedding[1])
@@ -96,10 +96,14 @@ def load_embeddings(training_data):
 if __name__ == "__main__":
     training_data = read_data(fable_text)
     dictionary, embedding, dict_size, embedding_dim = load_embeddings(training_data)
-    #net = model.Model(embedding, dict_size, embedding_dim)
+    net = model.Model(embedding, dict_size, embedding_dim)
     #net.inference([[1, 2, 3, 4, 5], [10, 9, 8, 7, 6]])
 
-    in_word = "paper house mother token cool"
-    in_data = [dictionary[in_word.splt(' ')]]
-    print(in_data) 
+    in_words = "long ago mice general venture"
+    in_data = np.array([dictionary[word] for word in in_words.split()])
+    in_data = np.expand_dims(in_data, axis = 0)
+    print(in_data)
+    
+    net.inference(in_data)
+    
 

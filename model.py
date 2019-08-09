@@ -54,6 +54,6 @@ class Model():
         self.ret = tf.layers.dense(inputs=self.layer2, units=latent_size, activation=tf.nn.tanh) 
         self.print_op = tf.Print(tf.shape(self.ret), [tf.shape(self.ret)]) 
  
-
+    
 
 
