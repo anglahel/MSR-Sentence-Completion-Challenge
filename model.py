@@ -36,10 +36,11 @@ class Model():
         
 
     def inference(self, word_ids):
-        sess = tf.Session()
-        init = tf.global_variables_initializer()
-        sess.run(init)
-        sess.run(self.print_op, feed_dict={self.word_embedding_class.word_ids: word_ids})
+        with self.graph.as_default():
+           sess = tf.Session()
+           init = tf.global_variables_initializer()
+           sess.run(init)
+           sess.run(self.print_op, feed_dict={self.word_embedding_class.word_ids: word_ids})
 
 
     
