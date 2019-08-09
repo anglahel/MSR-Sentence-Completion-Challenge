@@ -7,7 +7,7 @@ import collections
 import pandas as pd
 import re
 import random
-#import model
+import model
 
 def load_queries(dataset):
 
@@ -55,6 +55,7 @@ if __name__ == "__main__":
     current_labels = "train_answer.csv"
     batch_size = 32
     shuf = True
+    fst = True
 
     sentences, answers = load_queries(current_dataset)
     labels = load_labels(current_labels)
@@ -83,20 +84,29 @@ if __name__ == "__main__":
         j = 0
 
 
-    while(ind<n):
 
-        j = ind + batch_size
-        if(j>=n):
-             j = n
+    if(fst):
 
-        x = sentences[ind:j]
-        y = answers[ind:j]
-        l = labels[ind:j]
+        mall = []
+        for i in range(n):
 
-        ind += batch_size
+            tmp = answers[i][labels[i]-1]
+            answers[i][labels[i]-1] = answers[i][0]
+            answers[i][0] = tmp
 
+            mall.append(str(answers[i][0])+" "+str(answers[i][1])+" "+str(answers[i][2])+" "+str(answers[i][3])+" "+str(answers[i][4]))
 
-    #net = model.Model(embedding, dict_size, embedding_dim)
-    #net.inference([[1,2,3,4,5], [10,9,8,7,6]])
+        answers = []
 
+        for i in range(n):
+            answers.append(mall[i])
+
+    queries = []
+    for i in range(n):
+        queries.append((sentences[i],answers[i]))
+
+    model = model.Model()
+    trainer = Trainer(queries = queries, epochs = 100, batch_size = batch_size,model = model)
+
+    trainer.train()
 

@@ -56,10 +56,10 @@ class Model():
             self.sent_embedding_class = Sent_elmo_Embedding()
             self.embedded_sent = self.sent_embedding_class.sent_embedding_layer(self.sents)
 
-            self.word_lat = self.word_fully_connected(self.embedded_words, latent_size=128)
+            self.words_lat = self.word_fully_connected(self.embedded_words, latent_size=128)
             self.sent_lat = self.sent_fully_connected(self.embedded_sent, latent_size=128)
 
-            self.relevance = self.relevance_layer(self.sent_lat, self.word_lat)
+            self.relevance = self.relevance_layer(self.sent_lat, self.words_lat)
             #sess = tf.Session()
             #init = tf.global_variables_initializer()
             #sess.run(init)
@@ -95,7 +95,7 @@ class Model():
 
     def relevance_layer(self, sent_lat, words_lat):
 
-        cosine = tf.linalg.matmul(tf.nn.l2_normalize(sent_lat), tf.nn.l2_normalize(tf.transpose(word_lat), axis=0))
+        cosine = tf.squeeze(tf.linalg.matmul(tf.nn.l2_normalize(tf.expand_dims(sent_lat, axis=1), axis=2), tf.nn.l2_normalize(tf.transpose(words_lat, perm=[0, 2, 1]), axis=1)), axis=1)
         return cosine
 
 
