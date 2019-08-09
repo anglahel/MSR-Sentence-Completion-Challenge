@@ -17,7 +17,7 @@ def build_scalar_encoding(data):
     dictionary = dict()
     for word, _ in w_c:
         dictionary[word] = len(dictionary)
-        rev_dict = dict(zip(dictionary.values(), dictionary.keys()))
+    rev_dict = dict(zip(dictionary.values(), dictionary.keys()))
     return dictionary, rev_dict
 
 def read_data(raw_text):
@@ -100,10 +100,11 @@ if __name__ == "__main__":
     #net.inference([[1, 2, 3, 4, 5], [10, 9, 8, 7, 6]])
 
     in_words = "long ago mice general venture"
-    in_data = np.array([dictionary[word] for word in in_words.split()])
-    in_data = np.expand_dims(in_data, axis = 0)
-    print(in_data)
+    in_words = np.array([dictionary[word] for word in in_words.split()])
+    in_words = np.expand_dims(in_words, axis = 0)
+    in_sents = np.expand_dims(np.array([dictionary["neighbourhood"]]), axis=0)
+    print(in_words, in_sents)
     
-    net.inference(in_data)
+    net.inference(in_words, in_sents)
     
 

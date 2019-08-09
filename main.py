@@ -5,8 +5,9 @@ import numpy as np
 import tensorflow as tf
 import collections
 import pandas as pd
+import re
 
-import model
+#import model
 
 
 
@@ -18,12 +19,13 @@ def build_scalar_encoding(data):
     dictionary = dict()
     for word, _ in w_c:
         dictionary[word] = len(dictionary)
-        rev_dict = dict(zip(dictionary.values(), dictionary.keys()))
+
+    rev_dict = dict(zip(dictionary.values(), dictionary.keys()))
     return dictionary, rev_dict
 
 def read_data(raw_text):
-    content = raw_text
-    content = content.split() #splits the text by spaces (default split character)
+    content = raw_text.lower()
+    content = re.findall(r"[\w']+", content) #splits the text by spaces (default split character)
     content = np.array(content)
     content = np.reshape(content, [-1, ])
     return content
@@ -68,16 +70,58 @@ def load_embeddings():
     print("Loaded Glove")
 
     #TODO load training data in desirable form
-    
+
+    df = pd.read_csv("testing_data.csv")
+
+
+    val = df.values
+
+    training_data = ""
+
+    n = len(val)
+    for i in range(n):
+        query = val[i]
+        #training_data += query[1].split("_____")[0] + " " + query[1].split("_____")[-1]+" "
+        training_data += str(query[2]) + " "
+        training_data += str(query[3]) + " "
+        training_data += str(query[4]) + " "
+        training_data += str(query[5]) + " "
+        training_data += str(query[6]) + " "
+        if(i%7000 == 0):
+            print("Loaded " + str(100*i/n) + "%.")
+
+    training_data = read_data(training_data)
+
+    print("Done with extracting words.")
+    dictionary, rev_dictionary = build_scalar_encoding(training_data) #dictionary word-scalar
+
+    print("Done with creating dictionary.")
+
     df = pd.read_csv("training_data.csv")
 
-    print(df.values[:5])
 
+    val = df.values
 
-    training_data = read_data(fable_text)
+    training_data = ""
 
-    
-    dictionary, rev_dictionary = build_scalar_encoding(training_data) #dictionary word-scalar
+    n = len(val)
+    for i in range(n):
+        query = val[i]
+        #training_data += query[1].split("_____")[0] + " " + query[1].split("_____")[-1]+" "
+        training_data += str(query[2]) + " "
+        training_data += str(query[3]) + " "
+        training_data += str(query[4]) + " "
+        training_data += str(query[5]) + " "
+        training_data += str(query[6]) + " "
+        if(i%7000 == 0):
+            print("Loaded " + str(100*i/n) + "%.")
+
+    training_data = read_data(training_data)
+
+    print("Done with extracting words.")
+    dict, rev_dict = build_scalar_encoding(training_data) #dictionary word-scalar
+
+    print("Done with creating dictionary.")
 
     #Create embedding array
 
@@ -85,18 +129,30 @@ def load_embeddings():
     dict_size = len(dictionary)
     dict_as_list = sorted(dictionary.items(), key = lambda x : x[1])
 
+    #print(dict_as_list)
+
+    cnt = 0
+
+    vcb = set(vocab)
+
     for i in range(dict_size):
         elem = dict_as_list[i][0]
-        if elem in vocab:
-            tmp_array.append(emb_dict[elem])
+        print(elem)
+        if elem in dict:
+            tmp_array.append(dict[elem])
         else:
             rand = np.random.uniform(low=-0.2, high=0.2, size=embedding_dim)
             tmp_array.append(rand)
+            #print(elem)
+            cnt += 1
+        if(i%10000 == 0):
+             print("Processed " + str(i/dict_size) + "%.")
 
+
+    print(cnt)
     embedding = np.asarray(tmp_array)
-    print(len(embedding))
-    print("\n")
-    print(dict_size)
+    #print("Out of " + str(dict_size) + " words, " + str(cnt) + " aren't in GloVe.")
+    #print("GloVe contains " + str(len(vocab)) + " words.")
     #print(embedding[1])
     
     return embedding, dict_size, embedding_dim
@@ -106,4 +162,5 @@ if __name__ == "__main__":
     embedding, dict_size, embedding_dim = load_embeddings()
     #net = model.Model(embedding, dict_size, embedding_dim)
     #net.inference([[1,2,3,4,5], [10,9,8,7,6]])
+
 
