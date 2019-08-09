@@ -59,7 +59,7 @@ class Model():
             self.word_lat = self.word_fully_connected(self.embedded_words, latent_size=128)
             self.sent_lat = self.sent_fully_connected(self.embedded_sent, latent_size=128)
 
-            #self.relevance_layer()
+            self.relevance = self.relevance_layer(self.sent_lat, self.word_lat)
             #sess = tf.Session()
             #init = tf.global_variables_initializer()
             #sess.run(init)
@@ -73,10 +73,9 @@ class Model():
             sess = tf.Session()
             init = tf.global_variables_initializer()
             sess.run(init)
-            w = sess.run(self.word_lat, feed_dict={self.words: words})
-            s = sess.run(self.sent_lat, feed_dict={self.sents: sents})
-            print(w.shape)
+            s = sess.run(self.relevance, feed_dict={self.sents: sents, self.words:words})
             print(s.shape)
+            print(s)
             #sess.run(self.print_op_cos, feed_dict={self.sent_embedding_class.sents: sents, self.word_embedding_class.word_ids: word_ids})
 
     def word_fully_connected(self, input_embedding, latent_size=128): 
@@ -94,9 +93,10 @@ class Model():
         
         return tf.layers.dense(inputs=layer2, units=latent_size, activation=tf.nn.tanh, name="sent_fc3")
 
-    def relevance_layer(self):
+    def relevance_layer(self, sent_lat, words_lat):
 
-        self.cosine = tf.losses.cosine_distance(labels=tf.nn.l2_normalize(self.sent_lat, 0), predictions=tf.nn.l2_normalize(self.word_lat, 0), axis=0)
+        cosine = tf.linalg.matmul(tf.nn.l2_normalize(sent_lat), tf.nn.l2_normalize(tf.transpose(word_lat), axis=0))
+        return cosine
 
 
 
