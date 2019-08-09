@@ -6,4 +6,6 @@ data/*
 *.tgz
 *.csv*
 .*
+*.swp
+*.save*
 __pycache__
