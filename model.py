@@ -23,11 +23,7 @@ class Word_elmo_Embedding():
 
     def word_embedding_layer(self, words):
         embeddings = self.elmo(
-            inputs={
-                "tokens": words,
-                "sequence_len": [len(words), 5]
-            },
-            signature="tokens",
+            words,
             as_dict=True)["elmo"]
         return embeddings
 
@@ -38,11 +34,7 @@ class Sent_elmo_Embedding():
     
     def sent_embedding_layer(self, sents):
         embeddings = self.elmo(
-            inputs={
-                "tokens": sents,
-                "sequence_len": [len(sents), 5]
-            },
-            signature="tokens",
+            sents,
             as_dict=True)["default"]
         return embeddings
 
@@ -52,27 +44,27 @@ class Sent_elmo_Embedding():
 
 
 class Model():
-    def __init__(self, embedding, dict_size, embedding_dim):
+    def __init__(self):
         self.batch_size = None
         self.graph = tf.Graph()
         with self.graph.as_default():
             self.word_embedding_class = Word_elmo_Embedding()
             self.words = tf.placeholder(dtype=tf.string)
             self.sents = tf.placeholder(dtype=tf.string)
-            embedded_words = self.word_embedding_class.word_embedding_layer(words)
+            self.embedded_words = self.word_embedding_class.word_embedding_layer(self.words)
 
-            self.sent_embedding_class = Sent_elmo_Embedding(dict_size, embedding_dim)
-            embedded_sent = self.sent_embedding_class.sent_embedding_layer(sents)
+            self.sent_embedding_class = Sent_elmo_Embedding()
+            self.embedded_sent = self.sent_embedding_class.sent_embedding_layer(self.sents)
 
-            self.word_fully_connected(embedded_words, latent_size=128)
-            self.sent_fully_connected(embedded_sent, latent_size=128)
+            self.word_lat = self.word_fully_connected(self.embedded_words, latent_size=128)
+            self.sent_lat = self.sent_fully_connected(self.embedded_sent, latent_size=128)
 
-            self.relevance_layer()
-            sess = tf.Session()
+            #self.relevance_layer()
+            #sess = tf.Session()
             #init = tf.global_variables_initializer()
             #sess.run(init)
-            sess.run(self.word_embedding_class.assign_op, feed_dict={self.word_embedding_class.embedding_placeholder: embedding})
-            sess.run(self.sent_embedding_class.assign_op, feed_dict={self.sent_embedding_class.embedding_placeholder: embedding})
+            #sess.run(self.word_embedding_class.assign_op, feed_dict={self.word_embedding_class.embedding_placeholder: embedding})
+            #sess.run(self.sent_embedding_class.assign_op, feed_dict={self.sent_embedding_class.embedding_placeholder: embedding})
             #sess.run(word_embedding_class.print_op, feed_dict={word_embedding_class.word_ids: [[1]]})
             #sess.run(self.print_op, feed_dict={word_embedding_class.word_ids: [[1,2]]})
         
@@ -92,7 +84,7 @@ class Model():
         layer1 = tf.layers.dense(inputs=input_embedding, units=512, activation=tf.nn.tanh, name="word_fc1") 
         layer2 = tf.layers.dense(inputs=layer1, units=256, activation=tf.nn.tanh, name="word_fc2") 
  
-        self.word_lat = tf.layers.dense(inputs=layer2, units=128, activation=tf.nn.tanh, name="word_fc3") 
+        return tf.layers.dense(inputs=layer2, units=128, activation=tf.nn.tanh, name="word_fc3") 
  
     
     def sent_fully_connected(self, input_embedding, latent_size=128):
@@ -100,7 +92,7 @@ class Model():
         layer1 = tf.layers.dense(inputs=input_embedding, units=512, activation=tf.nn.tanh, name="sent_fc1")
         layer2 = tf.layers.dense(inputs=layer1, units=256, activation=tf.nn.tanh, name="sent_fc2")
         
-        self.sent_lat = tf.layers.dense(inputs=layer2, units=latent_size, activation=tf.nn.tanh, name="sent_fc3")
+        return tf.layers.dense(inputs=layer2, units=latent_size, activation=tf.nn.tanh, name="sent_fc3")
 
     def relevance_layer(self):
 

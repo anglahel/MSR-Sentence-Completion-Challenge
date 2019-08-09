@@ -95,14 +95,12 @@ def load_embeddings(training_data):
 
 if __name__ == "__main__":
     training_data = read_data(fable_text)
-    dictionary, embedding, dict_size, embedding_dim = load_embeddings(training_data)
-    net = model.Model(embedding, dict_size, embedding_dim)
+    #dictionary, embedding, dict_size, embedding_dim = load_embeddings(training_data)
+    net = model.Model()
     #net.inference([[1, 2, 3, 4, 5], [10, 9, 8, 7, 6]])
 
-    in_words = "long ago mice general venture"
-    in_words = np.array([dictionary[word] for word in in_words.split()])
-    in_words = np.expand_dims(in_words, axis = 0)
-    in_sents = np.expand_dims(np.array([dictionary["neighbourhood"]]), axis=0)
+    in_words = np.array(["long ago mice general venture"])
+    in_sents = ["Good day."]
     print(in_words, in_sents)
     
     net.inference(in_words, in_sents)
