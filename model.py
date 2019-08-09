@@ -24,16 +24,24 @@ class Model():
         self.batch_size = None
         self.graph = tf.Graph()
         with self.graph.as_default():
-            word_embedding_class = Word_Embedding(dict_size, embedding_dim)
-            embedded_words = word_embedding_class.word_embedding_layer()
+            self.word_embedding_class = Word_Embedding(dict_size, embedding_dim)
+            embedded_words = self.word_embedding_class.word_embedding_layer()
             self.word_fully_connected(embedded_words, latent_size=128)
             sess = tf.Session()
-            init = tf.global_variables_initializer()
-            sess.run(init)
-            sess.run(word_embedding_class.assign_op, feed_dict={word_embedding_class.embedding_placeholder: embedding})
-            sess.run(word_embedding_class.print_op, feed_dict={word_embedding_class.word_ids: [[1]]})
-            sess.run(self.print_op, feed_dict={word_embedding_class.word_ids: [[1,2]]})
-    
+            #init = tf.global_variables_initializer()
+            #sess.run(init)
+            sess.run(self.word_embedding_class.assign_op, feed_dict={self.word_embedding_class.embedding_placeholder: embedding})
+            #sess.run(word_embedding_class.print_op, feed_dict={word_embedding_class.word_ids: [[1]]})
+            #sess.run(self.print_op, feed_dict={word_embedding_class.word_ids: [[1,2]]})
+        
+
+    def inference(self, word_ids):
+        sess = tf.Session()
+        init = tf.global_variables_initializer()
+        sess.run(init)
+        sess.run(self.print_op, feed_dict={self.word_embedding_class.word_ids: word_ids})
+
+
     
     def word_fully_connected(self, input_embedding, latent_size=128): 
         

@@ -97,4 +97,5 @@ def load_embeddings():
 if __name__ == "__main__":
     embedding, dict_size, embedding_dim = load_embeddings()
     net = model.Model(embedding, dict_size, embedding_dim)
+    net.inference([[1,2,3,4,5], [10,9,8,7,6]])
 
