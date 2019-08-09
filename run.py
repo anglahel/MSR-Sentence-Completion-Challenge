@@ -46,7 +46,7 @@ another and nobody spoke . then the old mouse said it is easy to
 propose impossible remedies .
 """
 
-def load_embeddings():
+def load_embeddings(training_data):
     emb_reader = open(emb_data, 'r', encoding='UTF-8')
     
     vocab = []
@@ -67,7 +67,6 @@ def load_embeddings():
     print("Loaded Glove")
 
     #TODO load training data in desirable form
-    training_data = read_data(fable_text)
 
     
     dictionary, rev_dictionary = build_scalar_encoding(training_data) #dictionary word-scalar
@@ -91,11 +90,16 @@ def load_embeddings():
     print("\n")
     print(embedding[1])
     
-    return embedding, dict_size, embedding_dim
+    return dictionary, embedding, dict_size, embedding_dim
     
 
 if __name__ == "__main__":
-    embedding, dict_size, embedding_dim = load_embeddings()
-    net = model.Model(embedding, dict_size, embedding_dim)
-    net.inference([[1,2,3,4,5], [10,9,8,7,6]])
+    training_data = read_data(fable_text)
+    dictionary, embedding, dict_size, embedding_dim = load_embeddings(training_data)
+    #net = model.Model(embedding, dict_size, embedding_dim)
+    #net.inference([[1, 2, 3, 4, 5], [10, 9, 8, 7, 6]])
+
+    in_word = "paper house mother token cool"
+    in_data = [dictionary[in_word.splt(' ')]]
+    print(in_data) 
 
