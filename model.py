@@ -26,14 +26,16 @@ class Model():
         with self.graph.as_default():
             word_embedding_class = Word_Embedding(dict_size, embedding_dim)
             embedded_words = word_embedding_class.word_embedding_layer()
-            self.fully_connected(embedded_words, latent_size=128)
+            self.word_fully_connected(embedded_words, latent_size=128)
             sess = tf.Session()
+            init = tf.global_variables_initializer()
+            sess.run(init)
             sess.run(word_embedding_class.assign_op, feed_dict={word_embedding_class.embedding_placeholder: embedding})
             sess.run(word_embedding_class.print_op, feed_dict={word_embedding_class.word_ids: [[1]]})
-            sess.run(self.print_op, feed_dict={word_embedding_class.word_ids: [[1]]})
+            sess.run(self.print_op, feed_dict={word_embedding_class.word_ids: [[1,2]]})
     
     
-    def fully_connected(self, input_embedding, latent_size=128): 
+    def word_fully_connected(self, input_embedding, latent_size=128): 
         
         layer_size = 300 
   
@@ -41,7 +43,7 @@ class Model():
         self.layer2 = tf.layers.dense(inputs=self.layer1, units=layer_size, activation=tf.nn.tanh) 
  
         self.ret = tf.layers.dense(inputs=self.layer2, units=latent_size, activation=tf.nn.tanh) 
-        self.print_op = tf.Print(self.ret, [self.ret]) 
+        self.print_op = tf.Print(tf.shape(self.ret), [tf.shape(self.ret)]) 
  
 
 
