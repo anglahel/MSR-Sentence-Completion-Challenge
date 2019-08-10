@@ -8,6 +8,7 @@ import pandas as pd
 import re
 import random
 import model
+import trainer
 
 def load_queries(dataset):
 
@@ -53,12 +54,13 @@ if __name__ == "__main__":
 
     current_dataset = "training_data.csv"
     current_labels = "train_answer.csv"
-    batch_size = 32
+    batch_size = 512
     shuf = True
     fst = True
 
     sentences, answers = load_queries(current_dataset)
     labels = load_labels(current_labels)
+    print("Loaded data\n")
 
     n = len(sentences)
 
@@ -103,10 +105,10 @@ if __name__ == "__main__":
 
     queries = []
     for i in range(n):
-        queries.append((sentences[i],answers[i]))
+        queries.append([sentences[i],answers[i]])
 
     model = model.Model()
-    trainer = Trainer(queries = queries, epochs = 100, batch_size = batch_size,model = model)
+    trainer = trainer.Trainer(queries = np.array(queries), epochs = 100, batch_size = batch_size, model = model)
 
     trainer.train()
 

@@ -99,8 +99,8 @@ if __name__ == "__main__":
     net = model.Model()
     #net.inference([[1, 2, 3, 4, 5], [10, 9, 8, 7, 6]])
 
-    in_words = np.array(["long ago mice general venture", "long ago mice general venture"])
-    in_sents = ["Good day.", "Good day."]
+    in_words = np.array(['long ago mice general venture', 'insert pull game push commit', 'flow float double pair vector'])
+    in_sents = ['Good day, _____ how it was.', 'Random words _____ in here!', 'Art of war _____ summary hot?']
     print(in_words, in_sents)
     
     net.inference(in_words, in_sents)
