@@ -107,8 +107,14 @@ if __name__ == "__main__":
     for i in range(n):
         queries.append([sentences[i],answers[i]])
 
+    t_size = 300000
+    v_size = 400000
+
+    train_data = queries[0:t_size]
+    valid_data = queries[t_size:t_size+v_size]
+
     model = model.Model()
-    trainer = trainer.Trainer(queries = np.array(queries), epochs = 100, batch_size = batch_size, model = model)
+    trainer = trainer.Trainer(train_data = np.array(train_data),valid_data = np.array(valid_data), epochs = 100, batch_size = batch_size, model = model)
 
     trainer.train()
 

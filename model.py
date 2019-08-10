@@ -27,7 +27,7 @@ class Word_elmo_Embedding():
     def word_embedding_layer(self, words):
         embeddings = self.elmo(
             words,
-            as_dict=True)["elmo"]
+            as_dict=True)["word_emb"]
         return embeddings
 
 
@@ -55,22 +55,19 @@ class Model():
             self.sent_embedding_class = Sent_elmo_Embedding()
             self.embedded_sent = self.sent_embedding_class.sent_embedding_layer(self.sents)
 
-            words = tf.unstack(self.embedded_words, axis=1)
 
-            word1 = self.word_fully_connected(words[0], latent_size=128)
-            word2 = self.word_fully_connected(words[1], latent_size=128)
-            word3 = self.word_fully_connected(words[2], latent_size=128)
-            word4 = self.word_fully_connected(words[3], latent_size=128)
-            word5 = self.word_fully_connected(words[4], latent_size=128)
+            #words = tf.reshape(self.embedded_words, shape = [-1, 512])
 
-            self.words_lat = tf.stack([word1, word2, word3, word4, word5], axis=1)
+            self.words_lat = self.word_fully_connected(self.embedded_words, latent_size=128)
             self.sent_lat = self.sent_fully_connected(self.embedded_sent, latent_size=128)
+            
+            #self.words_lat = tf.reshape(self.words_lat, shape = [-1, 5, 128])
 
             self.relevance = self.relevance_layer(self.sent_lat, self.words_lat)
             self.output = self.soft_max_layer(self.relevance)
             self.loss = self.loss_func(self.output)
 
-            self.descent = self.train_op(self.loss)
+            self.descent = (self.train_op(self.loss), self.loss)
             self.accuracy = self.acc(self.output)
 
             #sess = tf.Session()
@@ -115,10 +112,21 @@ class Model():
     def relevance_layer(self, sent_lat, words_lat):
         
         norm_sent = tf.nn.l2_normalize(tf.expand_dims(sent_lat, axis=1), axis=2)
-        norm_word = tf.nn.l2_normalize(tf.transpose(words_lat, perm=[0,2,1]), axis=1)
+        norm_word = tf.nn.l2_normalize(tf.transpose(words_lat, perm=[0, 2, 1]), axis=1)
 
         cosine = tf.squeeze(tf.linalg.matmul(norm_sent, norm_word), axis=1)
         return cosine
+
+    """def cosine_layer(self, sent_lat, words_lat):
+        a = sent_lat
+        b = words_lat
+        c = tf.sqrt(tf.reduce_sum(tf.multiply(a,a),axis=1))
+        d = tf.sqrt(tf.reduce_sum(tf.multiply(b,b),axis=1))
+        e = tf.reduce_sum(tf.multiply(a,b),axis=1)
+        f = tf.multiply(c,d)
+        r = tf.divide(e,f)
+        return r
+    """
 
     def soft_max_layer(self, cosine):
         output = tf.nn.softmax(GAMMA*cosine)
