@@ -15,7 +15,7 @@ class Trainer():
 		self.print_ac = print_ac
 		self.fl = open("acc.txt","a+")
 		with model.graph.as_default():
-			self.sess = tf.Session()
+			self.sess = tf.Session(config = tf.ConfigProto(allow_soft_placement=True))
 			init = tf.global_variables_initializer()
 			self.sess.run(init)
 
@@ -41,11 +41,13 @@ class Trainer():
 				if(j>n):
 					j=n
 
-				sentences = self.train_data[ind:j,0]
-				words = self.train_data[ind:j,1]
+				sentences1 = self.train_data[ind:int((ind+j)/2),0]
+				sentences2 = self.train_data[int((ind+j)/2):j, 0]
+				words1 = self.train_data[ind:int((ind+j)/2),1]
+				words2 = self.train_data[int((ind+j)/2):j, 1]
 				#print(sentences)
 				#print(words)
-				_, loss = self.sess.run(self.model.descent,feed_dict = {self.model.words : words , self.model.sents : sentences})
+				_, loss = self.sess.run(self.model.descent,feed_dict = {self.model.words[0] : words1, self.model.words[1]: words2 , self.model.sents[0] : sentences1, self.model.sents[1]:sentences2})
 				ind = ind +self.batch_size
 				print("Trained "+str(j)+" samples with loss " + str(loss) + ".\n")
 
@@ -64,11 +66,12 @@ class Trainer():
 					j=n
 
 				d = j-ind
-				sentences = self.valid_data[ind:j,0]
+				sentences1 = self.valid_data[ind:int((ind+j)/2),0]
+				sentences2 = self.valid_data[int((ind+j)/2):j, 0]
 				#sentencesprim = self.valid_data[ind:j,0]
 				#print(sentences)
 				#sentences = ["On this occasion, wounded pride exasperated her wrath still _____."]
-				words = self.valid_data[ind:j,1]
+				words1 = self.valid_data[ind:j,1]
 				#wordsprim = self.valid_data[ind:j,1]
 				changed_words = []
 				perm = [0, 1, 2, 3, 4]
@@ -83,6 +86,7 @@ class Trainer():
 							labels.append(k)
 
 				words = np.array(changed_words)
+				words = np.split(words, 2)
 				#print(sentences[0:5])
 				#print(words[0:5])
 				#print(labels[0:5])
@@ -90,7 +94,7 @@ class Trainer():
 				#self.model.inference(words, sentences)
 				#sentences = ["How _____ your day yesterday evening?"]
 				#words = ["runner runner runner runner runner"]
-				t = self.sess.run(self.model.output,feed_dict = {self.model.words : words , self.model.sents : sentences})
+				t = self.sess.run(self.model.output,feed_dict = {self.model.words[0] : words[0], self.model.words[1]:words[1] , self.model.sents[0] : sentences1, self.model.sents[1]:sentences2})
 				output = np.argmax(t,axis = 1)
 				#a = self.sess.run(self.model.accuracy, feed_dict = {self.model.words : wordsprim, self.model.sents : sentencesprim})
 				cur_ac = 0

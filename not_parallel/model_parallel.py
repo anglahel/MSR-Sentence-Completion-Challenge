@@ -1,10 +1,11 @@
 import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
+import os
 
 
 GAMMA = 1
-LEARNING_RATE = 0.01
+LEARNING_RATE = 0.001
 
 class Word_Lookup_Embedding():
     def __init__(self, dict_size, embedding_dim):
@@ -47,45 +48,29 @@ class Model():
         self.batch_size = None
         self.graph = tf.Graph()
         with self.graph.as_default():
-            self.words = [tf.placeholder(dtype=tf.string), tf.placeholder(tf.string)]
-            self.sents = [tf.placeholder(dtype=tf.string), tf.placeholder(tf.string)]
-            self.optimizer = tf.train.GradientDescentOptimizer(LEARNING_RATE)
-            grads = []
-            acc = []
-            losses = []
-            outputs = []
+            self.word_embedding_class = Word_elmo_Embedding()
+            self.words = tf.placeholder(dtype=tf.string)
+            self.sents = tf.placeholder(dtype=tf.string)
+            self.embedded_words = self.word_embedding_class.word_embedding_layer(self.words)
+
+            self.sent_embedding_class = Sent_elmo_Embedding()
+            self.embedded_sent = self.sent_embedding_class.sent_embedding_layer(self.sents)
+
+
+            #words = tf.reshape(self.embedded_words, shape = [-1, 512])
+
+            self.words_lat = self.word_fully_connected(self.embedded_words, latent_size=128)
+            self.sent_lat = self.sent_fully_connected(self.embedded_sent, latent_size=128)
             
-            for i, d in enumerate(['/gpu:0', '/gpu:1']):
-                with tf.device(d):
+            #self.words_lat = tf.reshape(self.words_lat, shape = [-1, 5, 128])
 
-                    word_embedding_class = Word_elmo_Embedding()
-                    sent_embedding_class = Sent_elmo_Embedding()
-                    embedded_sent = sent_embedding_class.sent_embedding_layer(self.sents[i])
-                    embedded_words = word_embedding_class.word_embedding_layer(self.words[i])
+            self.relevance = self.relevance_layer(self.sent_lat, self.words_lat)
+            self.output = self.soft_max_layer(self.relevance)
+            self.loss = self.loss_func(self.output)
 
-                    #words = tf.reshape(self.embedded_words, shape = [-1, 512])
-
-                    words_lat = self.word_fully_connected(embedded_words, latent_size=128)
-                    sent_lat = self.sent_fully_connected(embedded_sent, latent_size=128)
-            
-                    #self.words_lat = tf.reshape(self.words_lat, shape = [-1, 5, 128])
-
-                    relevance = self.relevance_layer(sent_lat, words_lat)
-                    output = self.soft_max_layer(relevance)
-                    loss = self.loss_func(output)
-
-                    accuracy = self.acc(output)
-                    grads.append(self.calc_grads(loss))
-                    acc.append(accuracy)
-                    losses.append(loss)
-                    outputs.append(output)
-
-            with tf.device('/cpu:0'):
-                grads_and_vars = [(grads[0][idx][0] + grads[1][idx][0], grads[0][idx][1]) for idx in range(len(grads))]
-                self.loss = losses[0]+losses[1]
-                self.accuracy = (acc[0] + acc[1])/2
-                self.descent = (self.apply_grads(grads_and_vars), self.loss)
-                self.output = tf.concat(outputs, 0)
+            self.descent = (self.train_op(self.loss), self.loss)
+            self.accuracy = self.acc(self.output)
+            self.generate_summary()
 
             #sess = tf.Session()
             #init = tf.global_variables_initializer()
@@ -113,25 +98,25 @@ class Model():
 
     def word_fully_connected(self, input_embedding, latent_size=128): 
          
-        layer1 = tf.layers.dense(inputs=input_embedding, units=512, activation=tf.nn.tanh, name="word_fc1", reuse=tf.AUTO_REUSE) 
-        layer2 = tf.layers.dense(inputs=layer1, units=256, activation=tf.nn.tanh, name="word_fc2", reuse=tf.AUTO_REUSE) 
+        layer1 = tf.layers.dense(inputs=input_embedding, units=512, activation=tf.nn.tanh, name="word_fc1") 
+        layer2 = tf.layers.dense(inputs=layer1, units=256, activation=tf.nn.tanh, name="word_fc2") 
  
-        return tf.layers.dense(inputs=layer2, units=128, activation=tf.nn.tanh, name="word_fc3", reuse=tf.AUTO_REUSE) 
+        return tf.layers.dense(inputs=layer2, units=128, activation=tf.nn.tanh, name="word_fc3") 
  
     
     def sent_fully_connected(self, input_embedding, latent_size=128):
         
-        layer1 = tf.layers.dense(inputs=input_embedding, units=512, activation=tf.nn.tanh, name="sent_fc1", reuse=tf.AUTO_REUSE)
-        layer2 = tf.layers.dense(inputs=layer1, units=256, activation=tf.nn.tanh, name="sent_fc2", reuse = tf.AUTO_REUSE)
+        layer1 = tf.layers.dense(inputs=input_embedding, units=512, activation=tf.nn.tanh, name="sent_fc1")
+        layer2 = tf.layers.dense(inputs=layer1, units=256, activation=tf.nn.tanh, name="sent_fc2")
         
-        return tf.layers.dense(inputs=layer2, units=latent_size, activation=tf.nn.tanh, name="sent_fc3", reuse = tf.AUTO_REUSE)
+        return tf.layers.dense(inputs=layer2, units=latent_size, activation=tf.nn.tanh, name="sent_fc3")
 
     def relevance_layer(self, sent_lat, words_lat):
         
         norm_sent = tf.nn.l2_normalize(tf.expand_dims(sent_lat, axis=1), axis=2)
         norm_word = tf.nn.l2_normalize(tf.transpose(words_lat, perm=[0, 2, 1]), axis=1)
 
-        cosine = tf.squeeze(tf.linalg.matmul(norm_sent, norm_word), axis=1)
+        cosine = tf.squeeze(tf.linalg.matmul(norm_sent, norm_word), axis=1, name = "relevance")
         return cosine
 
     """def cosine_layer(self, sent_lat, words_lat):
@@ -154,8 +139,15 @@ class Model():
         return loss
     
     def train_op(self, loss):
-        descent = self.optimizer.minimize(loss)
+        optimizer = tf.train.GradientDescentOptimizer(LEARNING_RATE)
+        descent = optimizer.minimize(loss)
         return descent
+
+    def generate_summary(self):
+        with self.graph.as_default():
+            tf.summary.scalar("loss", self.loss)
+            tf.summary.scalar("acc", self.accuracy)
+            self.summary = tf.summary.merge_all()
 
     def acc(self, output):
         argmax = tf.math.argmax(output, axis=1)
@@ -163,9 +155,9 @@ class Model():
         acc = 1 - non_zero/tf.size(argmax, out_type=tf.int64)
         return acc
 
-    def calc_grads(self, loss):
-        grads = self.optimizer.compute_gradients(loss)
-        return grads
 
-    def apply_grads(self, grads):
-        return self.optimizer.apply_gradients(grads)
+    def save_graph_summary(self, summary_file):
+        with self.graph.as_default():
+            summary_writer = tf.summary.FileWriter(summary_file)
+            summary_writer.add_graph(tf.get_default_graph())
+            summary_writer.flush()

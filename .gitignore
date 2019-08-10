@@ -9,5 +9,5 @@ data/*
 *.swp
 *.save*
 */output/
-
+*.out*
 __pycache__
