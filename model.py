@@ -86,6 +86,7 @@ class Model():
                 self.accuracy = (acc[0] + acc[1])/2
                 self.descent = (self.apply_grads(grads_and_vars), self.loss)
                 self.output = tf.concat(outputs, 0)
+                self.generate_summary()
 
             #sess = tf.Session()
             #init = tf.global_variables_initializer()
@@ -169,3 +170,15 @@ class Model():
 
     def apply_grads(self, grads):
         return self.optimizer.apply_gradients(grads)
+
+    def generate_summary(self):
+        with self.graph.as_default():
+            tf.summary.scalar("loss", self.loss)
+            tf.summary.scalar("acc", self.accuracy)
+            self.summary = tf.summary.merge_all()
+
+    def save_graph_summary(self, summary_file):
+        with self.graph.as_default():
+            summary_writer = tf.summary.FileWriter(summary_file)
+            summary_writer.add_graph(tf.get_default_graph())
+            summary_writer.flush()

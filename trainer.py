@@ -6,13 +6,19 @@ import model
 
 class Trainer():
 	
-	def __init__(self,train_data,valid_data,epochs,batch_size,model,print_ac = True):
+	def __init__(self, train_data, valid_data, test_data, epochs, batch_size, model, print_ac = True):
 		self.epoch_count = epochs
 		self.train_data = train_data
 		self.valid_data = valid_data
+                self.test_data = test_data
 		self.batch_size = batch_size
 		self.model=model
 		self.print_ac = print_ac
+                self.output  = "output"
+		self.model.save_graph_summary(os.path.join(self.output, 'summary'))
+		self.train_summary_writer = tf.summary.FileWriter(os.path.join(self.output, 'train'))
+		self.valid_summary_writer = tf.summary.FileWriter(os.path.join(self.output, 'valid'))
+
 		self.fl = open("acc.txt","a+")
 		with model.graph.as_default():
 			self.sess = tf.Session(config = tf.ConfigProto(allow_soft_placement=True))
@@ -25,9 +31,10 @@ class Trainer():
 		for epoch in range(self.epoch_count):
 			self.train_epoch()
 			if(self.print_ac):
-				self.fl = open("acc.txt","a+")
-				self.fl.write("Accuracy in epoch " + str(epoch + 1) + ": " + str(self.acc()) + ".\n")
-				self.fl.close()
+				#self.fl = open("acc.txt","a+")
+				#self.fl.write("Accuracy in epoch " + str(epoch + 1) + ": " + str(self.acc()) + ".\n")
+				#self.fl.close()
+                                self.test()
 
 
 	def train_epoch(self):
@@ -117,4 +124,44 @@ class Trainer():
 				print("Validated " + str(j) + " samples acc: " + str(cur_ac) + " predictions of first element " + str(fst)+".")
 
 		return ac
+
+
+	def test(self):
+		n = len(self.test_data)
+		ac = 0
+		ind = 0
+		with self.model.graph.as_default():
+			while(ind<n):
+
+				j = ind + self.batch_size
+				if(j>n):
+					j=n
+
+				sentences1 = self.test_data[ind:int((ind+j)/2),0]
+				sentences2 = self.test_data[int((ind+j)/2):j, 0]
+				words1 = self.train_data[ind:int((ind+j)/2),1]
+				words2 = self.train_data[int((ind+j)/2):j, 1]
+	
+				#sents = self.test_data[ind:ind+1,0]
+				#words = self.test_data[ind:ind+1,1]
+                                t = self.sess.run(self.model.output,feed_dict = {self.model.words[0]: words1, self.model.words[1]:words2, self.model.sents[0]:sentences1, self.model.sents[1]:sentences1})
+				#cur_pred = np.argmax(output,axis=1)[0] + 1
+				output = np.argmax(t,axis = 1)
+	
+                                cur_ac = 0
+				fst = 0
+				#print(output[0:5])
+				#print(output.shape)
+				for i in range(d):
+					if(output[i]==labels[i]):
+						cur_ac += 1
+					if(output[i]==0):
+						fst += 1
+
+				ac +=cur_ac
+				
+                                
+                self.fl = open("acc.txt", "a+")
+		self.fl.write("Test data accuracy: " + str(ac/n)+".\n")
+		self.fl.close()
 
