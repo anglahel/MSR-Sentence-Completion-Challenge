@@ -8,4 +8,6 @@ data/*
 .*
 *.swp
 *.save*
+*/output/
+
 __pycache__
