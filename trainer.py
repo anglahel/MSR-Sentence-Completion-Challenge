@@ -10,11 +10,11 @@ class Trainer():
 		self.epoch_count = epochs
 		self.train_data = train_data
 		self.valid_data = valid_data
-                self.test_data = test_data
+		self.test_data = test_data
 		self.batch_size = batch_size
 		self.model=model
 		self.print_ac = print_ac
-                self.output  = "output"
+		self.output  = "output"
 		self.model.save_graph_summary(os.path.join(self.output, 'summary'))
 		self.train_summary_writer = tf.summary.FileWriter(os.path.join(self.output, 'train'))
 		self.valid_summary_writer = tf.summary.FileWriter(os.path.join(self.output, 'valid'))
@@ -144,11 +144,11 @@ class Trainer():
 	
 				#sents = self.test_data[ind:ind+1,0]
 				#words = self.test_data[ind:ind+1,1]
-                                t = self.sess.run(self.model.output,feed_dict = {self.model.words[0]: words1, self.model.words[1]:words2, self.model.sents[0]:sentences1, self.model.sents[1]:sentences1})
+				t = self.sess.run(self.model.output,feed_dict = {self.model.words[0]: words1, self.model.words[1]:words2, self.model.sents[0]:sentences1, self.model.sents[1]:sentences1})
 				#cur_pred = np.argmax(output,axis=1)[0] + 1
 				output = np.argmax(t,axis = 1)
 	
-                                cur_ac = 0
+				cur_ac = 0
 				fst = 0
 				#print(output[0:5])
 				#print(output.shape)
@@ -161,7 +161,7 @@ class Trainer():
 				ac +=cur_ac
 				
                                 
-                self.fl = open("acc.txt", "a+")
+		self.fl = open("acc.txt", "a+")
 		self.fl.write("Test data accuracy: " + str(ac/n)+".\n")
 		self.fl.close()
 
