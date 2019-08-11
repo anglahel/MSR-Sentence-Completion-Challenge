@@ -109,15 +109,15 @@ if __name__ == "__main__":
         for i in range(n):
             answers.append(mall[i])
 
-    queries = []
+    queries = mall
     for i in range(n):
         queries.append([sentences[i],answers[i]])
 
-    t_size = 170000
+    t_size = 150000
     v_size = 20000
 
-    train_data = queries[:]
-    valid_data = []
+    train_data = queries[0 : t_size]
+    valid_data = queries[t_size:]
 
 
     m = len(test_sent)
