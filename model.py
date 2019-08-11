@@ -81,7 +81,7 @@ class Model():
                     outputs.append(output)
 
             with tf.device('/cpu:0'):
-                grads_and_vars = [(grads[0][idx][0] + grads[1][idx][0], grads[0][idx][1]) for idx in range(len(grads))]
+                grads_and_vars = [(grads[0][idx][0] + grads[1][idx][0], grads[0][idx][1]) for idx in range(len(grads[0]))]
                 self.loss = losses[0]+losses[1]
                 self.accuracy = (acc[0] + acc[1])/2
                 self.descent = (self.apply_grads(grads_and_vars), self.loss)

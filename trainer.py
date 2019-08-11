@@ -155,7 +155,7 @@ class Trainer():
 				#print(output.shape)
 				labels = self.test_data[:,2]
 				for i in range(d):
-					if(str(output[i])==str(labels[i])):
+					if(str(output[i]+1)==str(labels[i])):
 						cur_ac += 1
 					if(output[i]==0):
 						fst += 1
