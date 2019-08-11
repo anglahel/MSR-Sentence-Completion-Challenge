@@ -104,10 +104,10 @@ for file_id in range(len(files)):
 
 print("Done!")
 
-nouns = gen(nouns,coef)
-verbs = gen(verbs,coef)
-adjs = gen(adjs,coef)
-advs = gen(advs,coef)
+nouns = list(set(nouns))
+verbs = list(set(verbs))
+adjs = list(set(adjs))
+advs = list(set(advs))
 print("Noun count: " + str(len(nouns)))
 print("Verb count: " + str(len(verbs)))
 print("Adjective count: " + str(len(adjs)))
@@ -140,8 +140,10 @@ for file in files:
 				if(ok == False):
 					valid_sentence = False
 
+			if(sentence[0]==' ' or sentence[0]== '-' or (sentence[0]>='a' and sentence[0]<='z')):
+				valid_sentence = False
 			words = nltk.word_tokenize(sentence)
-			if(len(words)>=5 and valid_sentence):
+			if(len(words)>=5 and len(words)<= 40 and valid_sentence):
 				modif = []
 				for word in words:
 					valid_word = True
