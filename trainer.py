@@ -35,6 +35,8 @@ class Trainer():
 				self.fl.write("Accuracy in epoch " + str(epoch + 1) + ": " + str(self.acc()) + ".\t")
 				self.fl.close()
 				self.test()
+				saver = tf.train.Saver();
+				saver.save(sess, ("/saves/model"+str(epoch)))
 
 
 	def train_epoch(self):
