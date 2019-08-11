@@ -4,7 +4,7 @@ import numpy as np
 
 
 GAMMA = 1
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.005
 
 class Word_Lookup_Embedding():
     def __init__(self, dict_size, embedding_dim):

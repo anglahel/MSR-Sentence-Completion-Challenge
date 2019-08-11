@@ -32,11 +32,10 @@ class Trainer():
 			self.train_epoch()
 			if(self.print_ac):
 				self.fl = open("acc.txt","a+")
-				self.fl.write("Accuracy in epoch " + str(epoch + 1) + ": " + str(self.acc()) + ".\t")
+				self.fl.write("Accuracy in epoch " + str(epoch + 1) + ": " + str(self.acc(epoch)) + ".\t")
 				self.fl.close()
 				self.test()
-				saver = tf.train.Saver();
-				saver.save(sess, ("/saves/model"+str(epoch)))
+				
 
 
 	def train_epoch(self):
@@ -62,7 +61,7 @@ class Trainer():
 
 
 
-	def acc(self):
+	def acc(self, ep):
 		n = len(self.valid_data)
 		ind = 0
 		m = 0
@@ -124,7 +123,8 @@ class Trainer():
 				#print("ACC: " + str(a))
 				#print(words)
 				print("Validated " + str(j) + " samples acc: " + str(cur_ac) + " predictions of first element " + str(fst)+".")
-
+			saver = tf.train.Saver()
+			saver.save(self.sess, ("./saves/model"+str(ep)))
 		return ac
 
 

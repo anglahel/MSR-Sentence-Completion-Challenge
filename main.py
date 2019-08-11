@@ -112,7 +112,7 @@ if __name__ == "__main__":
     for i in range(n):
         queries.append([sentences[i],answers[i]])
 
-    t_size = 500000
+    t_size = 550000
     v_size = 200000
 
     train_data = queries[0:t_size]

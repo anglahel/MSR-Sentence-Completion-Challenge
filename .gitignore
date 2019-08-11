@@ -1,4 +1,6 @@
 data/
+saves/
+saves/*
 data/*
 *.txt
 *.TXT
@@ -11,3 +13,7 @@ data/*
 */output/
 *.out*
 __pycache__
+*.data*
+*.index
+*.meta
+checkpoint
