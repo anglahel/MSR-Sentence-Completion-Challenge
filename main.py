@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     current_dataset = "training_data.csv"
     current_labels = "train_answer.csv"
-    batch_size = 1024
+    batch_size = 512
     shuf = True
     fst = True
 

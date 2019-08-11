@@ -22,8 +22,10 @@ class Trainer():
 		self.fl = open("acc.txt","a+")
 		with model.graph.as_default():
 			self.sess = tf.Session(config = tf.ConfigProto(allow_soft_placement=True))
+			#saver = tf.train.Saver()
 			init = tf.global_variables_initializer()
 			self.sess.run(init)
+			#saver.restore(self.sess, "./saves/model8")
 
 
 
