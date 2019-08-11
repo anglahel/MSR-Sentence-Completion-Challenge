@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_hub as hub
 import model
-
+import os
 
 class Trainer():
 	
@@ -31,10 +31,10 @@ class Trainer():
 		for epoch in range(self.epoch_count):
 			self.train_epoch()
 			if(self.print_ac):
-				#self.fl = open("acc.txt","a+")
-				#self.fl.write("Accuracy in epoch " + str(epoch + 1) + ": " + str(self.acc()) + ".\n")
-				#self.fl.close()
-                                self.test()
+				self.fl = open("acc.txt","a+")
+				self.fl.write("Accuracy in epoch " + str(epoch + 1) + ": " + str(self.acc()) + ".\t")
+				self.fl.close()
+				self.test()
 
 
 	def train_epoch(self):
@@ -78,7 +78,7 @@ class Trainer():
 				#sentencesprim = self.valid_data[ind:j,0]
 				#print(sentences)
 				#sentences = ["On this occasion, wounded pride exasperated her wrath still _____."]
-				words1 = self.valid_data[ind:j,1]
+				words = self.valid_data[ind:j,1]
 				#wordsprim = self.valid_data[ind:j,1]
 				changed_words = []
 				perm = [0, 1, 2, 3, 4]
@@ -130,13 +130,14 @@ class Trainer():
 		n = len(self.test_data)
 		ac = 0
 		ind = 0
+		d = 0
 		with self.model.graph.as_default():
 			while(ind<n):
-
+				
 				j = ind + self.batch_size
 				if(j>n):
 					j=n
-
+				d = j - ind
 				sentences1 = self.test_data[ind:int((ind+j)/2),0]
 				sentences2 = self.test_data[int((ind+j)/2):j, 0]
 				words1 = self.train_data[ind:int((ind+j)/2),1]
@@ -152,13 +153,15 @@ class Trainer():
 				fst = 0
 				#print(output[0:5])
 				#print(output.shape)
+				labels = self.test_data[:,2]
 				for i in range(d):
-					if(output[i]==labels[i]):
+					if(str(output[i])==str(labels[i])):
 						cur_ac += 1
 					if(output[i]==0):
 						fst += 1
 
 				ac +=cur_ac
+				ind += self.batch_size
 				
                                 
 		self.fl = open("acc.txt", "a+")
