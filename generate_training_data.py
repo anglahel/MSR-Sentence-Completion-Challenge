@@ -62,7 +62,7 @@ verbs = []
 
 path = "data/Holmes_Training_Data/"
 files = os.listdir(path)
-files = files[0:10]
+files = files[:]
 er_cnt = 0
 coef = 15
 for file_id in range(len(files)):
