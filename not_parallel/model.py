@@ -7,6 +7,7 @@ import os
 GAMMA = 1
 LEARNING_RATE = 0.001
 
+
 class Word_Lookup_Embedding():
     def __init__(self, dict_size, embedding_dim):
         self.graph = tf.Graph()
@@ -56,13 +57,12 @@ class Model():
             self.sent_embedding_class = Sent_elmo_Embedding()
             self.embedded_sent = self.sent_embedding_class.sent_embedding_layer(self.sents)
 
-
-            #words = tf.reshape(self.embedded_words, shape = [-1, 512])
+            # words = tf.reshape(self.embedded_words, shape = [-1, 512])
 
             self.words_lat = self.word_fully_connected(self.embedded_words, latent_size=128)
             self.sent_lat = self.sent_fully_connected(self.embedded_sent, latent_size=128)
             
-            #self.words_lat = tf.reshape(self.words_lat, shape = [-1, 5, 128])
+            # self.words_lat = tf.reshape(self.words_lat, shape = [-1, 5, 128])
 
             self.relevance = self.relevance_layer(self.sent_lat, self.words_lat)
             self.output = self.soft_max_layer(self.relevance)
@@ -72,13 +72,13 @@ class Model():
             self.accuracy = self.acc(self.output)
             self.generate_summary()
 
-            #sess = tf.Session()
-            #init = tf.global_variables_initializer()
-            #sess.run(init)
-            #sess.run(self.word_embedding_class.assign_op, feed_dict={self.word_embedding_class.embedding_placeholder: embedding})
-            #sess.run(self.sent_embedding_class.assign_op, feed_dict={self.sent_embedding_class.embedding_placeholder: embedding})
-            #sess.run(word_embedding_class.print_op, feed_dict={word_embedding_class.word_ids: [[1]]})
-            #sess.run(self.print_op, feed_dict={word_embedding_class.word_ids: [[1,2]]})
+            # sess = tf.Session()
+            # init = tf.global_variables_initializer()
+            # sess.run(init)
+            # sess.run(self.word_embedding_class.assign_op, feed_dict={self.word_embedding_class.embedding_placeholder: embedding})
+            # sess.run(self.sent_embedding_class.assign_op, feed_dict={self.sent_embedding_class.embedding_placeholder: embedding})
+            # sess.run(word_embedding_class.print_op, feed_dict={word_embedding_class.word_ids: [[1]]})
+            # sess.run(self.print_op, feed_dict={word_embedding_class.word_ids: [[1,2]]})
         
     def inference(self, words, sents):
         with self.graph.as_default():
@@ -94,7 +94,7 @@ class Model():
             a = sess.run(self.accuracy, feed_dict={self.sents:sents, self.words:words})
             print(a.shape)
             print(a)
-            #sess.run(self.print_op_cos, feed_dict={self.sent_embedding_class.sents: sents, self.word_embedding_class.word_ids: word_ids})
+            # sess.run(self.print_op_cos, feed_dict={self.sent_embedding_class.sents: sents, self.word_embedding_class.word_ids: word_ids})
 
     def word_fully_connected(self, input_embedding, latent_size=128): 
          
@@ -102,8 +102,7 @@ class Model():
         layer2 = tf.layers.dense(inputs=layer1, units=256, activation=tf.nn.tanh, name="word_fc2") 
  
         return tf.layers.dense(inputs=layer2, units=128, activation=tf.nn.tanh, name="word_fc3") 
- 
-    
+  
     def sent_fully_connected(self, input_embedding, latent_size=128):
         
         layer1 = tf.layers.dense(inputs=input_embedding, units=512, activation=tf.nn.tanh, name="sent_fc1")
@@ -116,7 +115,7 @@ class Model():
         norm_sent = tf.nn.l2_normalize(tf.expand_dims(sent_lat, axis=1), axis=2)
         norm_word = tf.nn.l2_normalize(tf.transpose(words_lat, perm=[0, 2, 1]), axis=1)
 
-        cosine = tf.squeeze(tf.linalg.matmul(norm_sent, norm_word), axis=1, name = "relevance")
+        cosine = tf.squeeze(tf.linalg.matmul(norm_sent, norm_word), axis=1, name="relevance")
         return cosine
 
     """def cosine_layer(self, sent_lat, words_lat):
@@ -154,7 +153,6 @@ class Model():
         non_zero = tf.math.count_nonzero(argmax)
         acc = 1 - non_zero/tf.size(argmax, out_type=tf.int64)
         return acc
-
 
     def save_graph_summary(self, summary_file):
         with self.graph.as_default():
