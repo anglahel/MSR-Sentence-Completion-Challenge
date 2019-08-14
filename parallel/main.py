@@ -10,6 +10,7 @@ import random
 import model
 import trainer
 
+
 def load_queries(dataset):
 
     df = pd.read_csv(dataset)
@@ -23,8 +24,7 @@ def load_queries(dataset):
         queries.append(entry[1])
         answers.append(entry[2:7])
 
-    return queries,answers
-
+    return queries, answers
 
 
 def load_labels(dataset):
@@ -35,19 +35,18 @@ def load_labels(dataset):
     labels = []
 
     for i in range(n):
-         if(val[i][1]=='a'):
+        if(val[i][1] == 'a'):
             labels.append(1)
-         elif(val[i][1]=='b'):
+        elif(val[i][1] == 'b'):
             labels.append(2)
-         elif(val[i][1]=='c'):
+        elif(val[i][1] == 'c'):
             labels.append(3)
-         elif(val[i][1]=='d'):
+        elif(val[i][1] == 'd'):
             labels.append(4)
-         else:
+        else:
             labels.append(5)
 
     return labels
-
 
 
 if __name__ == "__main__":
@@ -60,7 +59,6 @@ if __name__ == "__main__":
 
     sentences, answers = load_queries(current_dataset)
     labels = load_labels(current_labels)
-
 
     test_sent, test_answ = load_queries("testing_data.csv")
     test_labels = load_labels("test_answer.csv")
@@ -90,8 +88,6 @@ if __name__ == "__main__":
         ind = 0
         j = 0
 
-
-
     if(fst):
 
         mall = []
@@ -110,7 +106,7 @@ if __name__ == "__main__":
 
     queries = []
     for i in range(n):
-        queries.append([sentences[i],answers[i]])
+        queries.append([sentences[i], answers[i]])
 
     t_size = 550000
     v_size = 200000
@@ -122,10 +118,10 @@ if __name__ == "__main__":
 
     test_data = []
     for i in range(m):
-        test_data.append([test_sent[i],str(test_answ[i][0])+" "+str(test_answ[i][1])+" "+str(test_answ[i][2])+" "+str(test_answ[i][3])+" "+str(test_answ[i][4]),test_labels[i]])
+        test_data.append([test_sent[i], str(test_answ[i][0])+" "+str(test_answ[i][1])+" "+str(test_answ[i][2])+" "+str(test_answ[i][3])+" "+str(test_answ[i][4]), test_labels[i]])
 
     model = model.Model()
-    trainer = trainer.Trainer(train_data = np.array(train_data),valid_data = np.array(valid_data), test_data=np.array(test_data), epochs = 100, batch_size = batch_size, model = model)
+    trainer = trainer.Trainer(train_data=np.array(train_data), valid_data=np.array(valid_data), test_data=np.array(test_data), epochs=100, batch_size=batch_size, model=model)
 
     trainer.train()
 
