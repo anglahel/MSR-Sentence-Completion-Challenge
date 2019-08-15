@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
     current_dataset = "training_data.csv"
     current_labels = "train_answer.csv"
-    batch_size = 512
+    batch_size = 16
     shuf = True
     fst = True
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
         for i in range(n):
             answers.append(mall[i])
 
-    queries = mall
+    queries = []
     for i in range(n):
         queries.append([sentences[i], answers[i]])
 
@@ -119,6 +119,7 @@ if __name__ == "__main__":
         test_data.append([test_sent[i], str(test_answ[i][0])+" "+str(test_answ[i][1])+" "+str(test_answ[i][2])+" "+str(test_answ[i][3])+" "+str(test_answ[i][4]), test_labels[i]])
 
 
+    print(np.array(train_data)[0])
 
     model = model.Model()
     trainer = trainer.Trainer(train_data=np.array(train_data), valid_data=np.array(valid_data), test_data=np.array(test_data), epochs=100, batch_size=batch_size, model=model)
