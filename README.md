@@ -3,7 +3,7 @@
 Next word recommendation model for sentence completion using Deep Structured Semantic Models.
 Research was based on:
 https://www.researchgate.net/publication/262289160_Learning_deep_structured_semantic_models_for_web_search_using_clickthrough_data  
-trying to adopt same ideals for web search recommendations to sentence completion recommendations
+trying to adopt same ideas applied to web search recommendations to sentence completion recommendations
 
 Requirements:  
 tensorflow>=1.7  
