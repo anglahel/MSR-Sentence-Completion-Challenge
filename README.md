@@ -1,4 +1,5 @@
 # MSR-Sentence-Completion-Challenge
+https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/MSR_SCCD.pdf
 ## Petnica Summer Institute: Machine Learning Project (2019)
 Next word recommendation model for sentence completion using Deep Structured Semantic Models.
 Research was based on:
